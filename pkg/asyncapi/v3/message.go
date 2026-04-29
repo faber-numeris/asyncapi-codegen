@@ -218,12 +218,6 @@ func (msg *Message) generateHeadersMetadata() error {
 		return err
 	}
 
-	if msg.Headers.Follow().Type != SchemaTypeIsObject.String() {
-		return fmt.Errorf(
-			"%w: %q headers must be an object, is %q",
-			extensions.ErrAsyncAPI, msg.Name, msg.Headers.Follow().Type)
-	}
-
 	return nil
 }
 
@@ -232,7 +226,18 @@ func (msg *Message) setHeadersDependencies(spec Specification) error {
 		return nil
 	}
 
-	return msg.Headers.setDependencies(spec)
+	if err := msg.Headers.setDependencies(spec); err != nil {
+		return err
+	}
+
+	// Check Headers is an object, after processing
+	if msg.Headers.Follow().Type != SchemaTypeIsObject.String() {
+		return fmt.Errorf(
+			"%w: %q headers must be an object, is %q",
+			extensions.ErrAsyncAPI, msg.Name, msg.Headers.Follow().Type)
+	}
+
+	return nil
 }
 
 func (msg *Message) generateOneOfMetadata() error {

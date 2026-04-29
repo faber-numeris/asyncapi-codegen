@@ -1,0 +1,41 @@
+asyncapi: 3.0.0
+info:
+  title: Sample App with Header References
+  version: 1.0.0
+
+channels:
+  testing:
+    address: v3.issue280.test
+    messages:
+      testMessage:
+        name: testMessage
+        headers:
+          $ref: '#/components/schemas/KafkaHeaders'
+        payload:
+          $ref: '#/components/schemas/TestPayload'
+
+operations:
+  handleTesting:
+    action: "receive"
+    channel:
+      $ref: "#/channels/testing"
+    messages:
+      - $ref: "#/channels/testing/messages/testMessage"
+
+components:
+  schemas:
+    KafkaHeaders:
+      type: object
+      properties:
+        kafka_correlationId:
+          type: string
+        kafka_timestamp:
+          type: string
+          format: date-time
+        kafka_key:
+          type: string
+    TestPayload:
+      type: object
+      properties:
+        message:
+          type: string
